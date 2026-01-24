@@ -1,0 +1,78 @@
+﻿@page "/"
+@inject NavigationManager Navigation
+
+<div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem;">
+    <div style="max-width: 1200px; width: 100%; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); border-radius: 24px; padding: 3rem; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);">
+        
+        <div style="text-align: center; margin-bottom: 3rem;">
+            <div style="font-size: 5rem; margin-bottom: 1rem;">📔</div>
+            <h1 style="font-size: 3.5rem; font-weight: 800; background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 1rem;">
+                Welcome to Your Journal
+            </h1>
+            <p style="font-size: 1.25rem; color: #64748b; max-width: 600px; margin: 0 auto 2rem;">
+                Capture your thoughts, track your moods, and reflect on your journey
+            </p>
+            
+            <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                <button @onclick="GoToNewEntry" style="padding: 1rem 2.5rem; background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); color: white; border: none; border-radius: 12px; font-size: 1.1rem; font-weight: 600; cursor: pointer; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);">
+                    ✍️ Start Writing
+                </button>
+                <button @onclick="GoToDashboard" style="padding: 1rem 2.5rem; background: white; color: #6366f1; border: 2px solid #6366f1; border-radius: 12px; font-size: 1.1rem; font-weight: 600; cursor: pointer;">
+                    📊 View Dashboard
+                </button>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem; margin-top: 4rem;">
+            
+            <div style="background: white; padding: 2rem; border-radius: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center;">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">📝</div>
+                <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem;">Daily Journaling</h3>
+                <p style="color: #64748b; font-size: 0.95rem;">Write one entry per day with rich formatting</p>
+            </div>
+
+            <div style="background: white; padding: 2rem; border-radius: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center;">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">😊</div>
+                <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem;">Mood Tracking</h3>
+                <p style="color: #64748b; font-size: 0.95rem;">Track emotions across 15 different moods</p>
+            </div>
+
+            <div style="background: white; padding: 2rem; border-radius: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center;">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">🏷️</div>
+                <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem;">Smart Tags</h3>
+                <p style="color: #64748b; font-size: 0.95rem;">Organize with custom tags</p>
+            </div>
+
+            <div style="background: white; padding: 2rem; border-radius: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center;">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">📅</div>
+                <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem;">Calendar View</h3>
+                <p style="color: #64748b; font-size: 0.95rem;">Visual calendar with mood indicators</p>
+            </div>
+
+            <div style="background: white; padding: 2rem; border-radius: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center;">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">🔥</div>
+                <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem;">Streak Tracking</h3>
+                <p style="color: #64748b; font-size: 0.95rem;">Build daily journaling habits</p>
+            </div>
+
+            <div style="background: white; padding: 2rem; border-radius: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center;">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">📊</div>
+                <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem;">Analytics</h3>
+                <p style="color: #64748b; font-size: 0.95rem;">Insights on moods and patterns</p>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@code {
+    private void GoToNewEntry()
+    {
+        Navigation.NavigateTo("/entry-form");
+    }
+
+    private void GoToDashboard()
+    {
+        Navigation.NavigateTo("/dashboard");
+    }
+}

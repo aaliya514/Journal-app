@@ -1,0 +1,176 @@
+﻿@page "/dashboard"
+@inject JournalService JournalService
+@inject NavigationManager Navigation
+
+<div style="min-height: 100vh; padding: 2rem;">
+    <div style="max-width: 1400px; margin: 0 auto;">
+
+        <div style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); border-radius: 24px; padding: 2rem; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+            <div>
+                <h1 style="font-size: 2.5rem; font-weight: 800; background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 0.5rem;">
+                    📊 Dashboard
+                </h1>
+                <p style="color: #64748b; font-size: 1rem;">Track your journaling progress</p>
+            </div>
+            <button @onclick="GoToNewEntry" style="padding: 0.75rem 1.5rem; background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); color: white; border: none; border-radius: 12px; font-weight: 600; cursor: pointer; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);">
+                ➕ New Entry
+            </button>
+        </div>
+
+        <div style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); border-radius: 24px; padding: 2rem; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); margin-bottom: 2rem;">
+            <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem;">📝 Today's Entry</h2>
+            <p style="color: #64748b; margin-bottom: 1rem;">@DateTime.Today.ToString("dddd, MMMM dd, yyyy")</p>
+
+            @if (todayEntry != null)
+            {
+                <div style="padding: 1.5rem; background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%); border-radius: 12px; border: 2px solid rgba(99, 102, 241, 0.2);">
+                    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap;">
+                        <span style="padding: 0.5rem 1rem; border-radius: 20px; background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%); border: 2px solid rgba(99, 102, 241, 0.2); font-weight: 600;">
+                            @MoodConstants.GetMoodEmoji(todayEntry.PrimaryMood) @todayEntry.PrimaryMood
+                        </span>
+                        <span style="color: #64748b;">📝 @todayEntry.WordCount words</span>
+                    </div>
+                    <button @onclick="@(() => EditEntry(todayEntry.Id))" style="padding: 0.5rem 1rem; background: white; color: #6366f1; border: 2px solid #6366f1; border-radius: 8px; font-weight: 600; cursor: pointer;">
+                        ✏️ Edit Entry
+                    </button>
+                </div>
+            }
+            else
+            {
+                <div style="padding: 2rem; text-align: center; background: rgba(248, 250, 252, 0.5); border-radius: 12px; border: 2px dashed #e2e8f0;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">✍️</div>
+                    <p style="color: #94a3b8; margin-bottom: 1.5rem;">No entry yet for today</p>
+                    <button @onclick="GoToNewEntry" style="padding: 0.75rem 1.5rem; background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); color: white; border: none; border-radius: 12px; font-weight: 600; cursor: pointer;">
+                        Write Today's Entry
+                    </button>
+                </div>
+            }
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+
+            <div style="background: white; padding: 1.5rem; border-radius: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center;">
+                <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🔥</div>
+                <div style="font-size: 2.25rem; font-weight: 700; background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">@currentStreak</div>
+                <div style="color: #64748b; font-size: 0.875rem; font-weight: 500;">Current Streak</div>
+            </div>
+
+            <div style="background: white; padding: 1.5rem; border-radius: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center;">
+                <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🏆</div>
+                <div style="font-size: 2.25rem; font-weight: 700; background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">@longestStreak</div>
+                <div style="color: #64748b; font-size: 0.875rem; font-weight: 500;">Longest Streak</div>
+            </div>
+
+            <div style="background: white; padding: 1.5rem; border-radius: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center;">
+                <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">📝</div>
+                <div style="font-size: 2.25rem; font-weight: 700; background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">@totalEntries</div>
+                <div style="color: #64748b; font-size: 0.875rem; font-weight: 500;">Total Entries</div>
+            </div>
+
+            <div style="background: white; padding: 1.5rem; border-radius: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center;">
+                <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">@topMoodEmoji</div>
+                <div style="font-size: 1.5rem; font-weight: 700; background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">@topMood</div>
+                <div style="color: #64748b; font-size: 0.875rem; font-weight: 500;">Top Mood</div>
+            </div>
+
+        </div>
+
+        <div style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); border-radius: 24px; padding: 2rem; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); margin-bottom: 2rem;">
+            <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 1.5rem;">😊 Mood Distribution</h2>
+
+            <div style="margin-bottom: 1.25rem;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                    <span style="font-weight: 600; color: #065f46;">😊 Positive</span>
+                    <span style="font-weight: 700; color: #10b981;">@positivePercent%</span>
+                </div>
+                <div style="height: 28px; background: #f3f4f6; border-radius: 14px; overflow: hidden;">
+                    <div style="height: 100%; width: @(positivePercent)%; background: linear-gradient(90deg, #10b981 0%, #059669 100%); border-radius: 14px; transition: width 1s;"></div>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 1.25rem;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                    <span style="font-weight: 600; color: #1e40af;">😐 Neutral</span>
+                    <span style="font-weight: 700; color: #3b82f6;">@neutralPercent%</span>
+                </div>
+                <div style="height: 28px; background: #f3f4f6; border-radius: 14px; overflow: hidden;">
+                    <div style="height: 100%; width: @(neutralPercent)%; background: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%); border-radius: 14px; transition: width 1s;"></div>
+                </div>
+            </div>
+
+            <div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                    <span style="font-weight: 600; color: #991b1b;">😢 Negative</span>
+                    <span style="font-weight: 700; color: #ef4444;">@negativePercent%</span>
+                </div>
+                <div style="height: 28px; background: #f3f4f6; border-radius: 14px; overflow: hidden;">
+                    <div style="height: 100%; width: @(negativePercent)%; background: linear-gradient(90deg, #ef4444 0%, #dc2626 100%); border-radius: 14px; transition: width 1s;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+            <button @onclick="GoToJournalList" style="padding: 0.75rem 1.5rem; background: white; color: #6366f1; border: 2px solid #6366f1; border-radius: 12px; font-weight: 600; cursor: pointer;">
+                📋 View All Entries
+            </button>
+            <button @onclick="GoToCalendar" style="padding: 0.75rem 1.5rem; background: white; color: #6366f1; border: 2px solid #6366f1; border-radius: 12px; font-weight: 600; cursor: pointer;">
+                📅 Calendar View
+            </button>
+            <button @onclick="GoToSettings" style="padding: 0.75rem 1.5rem; background: white; color: #6366f1; border: 2px solid #6366f1; border-radius: 12px; font-weight: 600; cursor: pointer;">
+                ⚙️ Settings
+            </button>
+        </div>
+
+    </div>
+</div>
+
+@code {
+    private JournalEntry? todayEntry = null;
+    private int currentStreak = 0;
+    private int longestStreak = 0;
+    private int totalEntries = 0;
+    private string topMood = "None";
+    private string topMoodEmoji = "📝";
+    private double positivePercent = 0;
+    private double neutralPercent = 0;
+    private double negativePercent = 0;
+
+    protected override void OnInitialized()
+    {
+        LoadDashboardData();
+    }
+
+    private void LoadDashboardData()
+    {
+        todayEntry = JournalService.GetEntryByDate(DateTime.Today);
+
+        var allEntries = JournalService.GetAllEntries();
+        totalEntries = allEntries.Count;
+
+        var streaks = JournalService.CalculateStreaks();
+        currentStreak = streaks.Current;
+        longestStreak = streaks.Longest;
+
+        var topMoodData = JournalService.GetMostFrequentMood();
+        if (topMoodData.Count > 0)
+        {
+            topMood = topMoodData.Mood;
+            topMoodEmoji = MoodConstants.GetMoodEmoji(topMood);
+        }
+
+        var moodDist = JournalService.GetMoodDistribution();
+        var total = moodDist.Values.Sum();
+        if (total > 0)
+        {
+            positivePercent = Math.Round((double)moodDist["Positive"] / total * 100, 1);
+            neutralPercent = Math.Round((double)moodDist["Neutral"] / total * 100, 1);
+            negativePercent = Math.Round((double)moodDist["Negative"] / total * 100, 1);
+        }
+    }
+
+    private void GoToNewEntry() => Navigation.NavigateTo("/entry-form");
+    private void EditEntry(int id) => Navigation.NavigateTo($"/entry-form/{id}");
+    private void GoToJournalList() => Navigation.NavigateTo("/journal-list");
+    private void GoToCalendar() => Navigation.NavigateTo("/calendar-view");
+    private void GoToSettings() => Navigation.NavigateTo("/settings");
+}

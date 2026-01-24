@@ -1,0 +1,222 @@
+﻿@page "/settings"
+@inject JournalService JournalService
+@inject NavigationManager Navigation
+@inject IJSRuntime JSRuntime
+
+<div style="min-height: 100vh; padding: 2rem;">
+    <div style="max-width: 900px; margin: 0 auto;">
+
+        <div style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); border-radius: 24px; padding: 2.5rem; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);">
+
+            <div style="margin-bottom: 2rem;">
+                <h1 style="font-size: 2.5rem; font-weight: 800; background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 0.5rem;">
+                    ⚙️ Settings
+                </h1>
+                <p style="color: #64748b; font-size: 1rem;">Manage your journal preferences</p>
+            </div>
+
+            @if (!string.IsNullOrEmpty(successMessage))
+            {
+                <div style="padding: 1rem; background: #d1fae5; border: 2px solid #10b981; border-radius: 12px; color: #065f46; margin-bottom: 1.5rem;">
+                    ✓ @successMessage
+                </div>
+            }
+
+            <div style="background: white; padding: 2rem; border-radius: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 2rem;">
+                <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 1.5rem; color: #1e293b;">🎨 Appearance</h2>
+
+                <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+                    <div>
+                        <h3 style="font-weight: 600; color: #1e293b; margin-bottom: 0.25rem;">Theme</h3>
+                        <p style="color: #64748b; font-size: 0.875rem;">Choose your preferred color scheme</p>
+                    </div>
+
+                    <div style="display: flex; gap: 1rem;">
+                        @if (currentTheme == "light")
+                        {
+                            <button @onclick="SetLightTheme"
+                                    style="padding: 0.75rem 1.5rem; background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); color: white; border: 2px solid #6366f1; border-radius: 12px; font-weight: 600; cursor: pointer; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4); transition: all 0.3s;">
+                                ☀️ Light
+                            </button>
+                        }
+                        else
+                        {
+                            <button @onclick="SetLightTheme"
+                                    style="padding: 0.75rem 1.5rem; background: white; color: #64748b; border: 2px solid #e2e8f0; border-radius: 12px; font-weight: 600; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: all 0.3s;">
+                                ☀️ Light
+                            </button>
+                        }
+
+                        @if (currentTheme == "dark")
+                        {
+                            <button @onclick="SetDarkTheme"
+                                    style="padding: 0.75rem 1.5rem; background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: white; border: 2px solid #1e293b; border-radius: 12px; font-weight: 600; cursor: pointer; box-shadow: 0 4px 15px rgba(30, 41, 59, 0.4); transition: all 0.3s;">
+                                🌙 Dark
+                            </button>
+                        }
+                        else
+                        {
+                            <button @onclick="SetDarkTheme"
+                                    style="padding: 0.75rem 1.5rem; background: white; color: #64748b; border: 2px solid #e2e8f0; border-radius: 12px; font-weight: 600; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: all 0.3s;">
+                                🌙 Dark
+                            </button>
+                        }
+                    </div>
+                </div>
+
+                <div style="margin-top: 1.5rem; padding: 1rem; background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%); border-radius: 12px; border: 1px solid rgba(99, 102, 241, 0.1);">
+                    <p style="color: #64748b; font-size: 0.875rem; margin: 0;">
+                        <strong>Current theme:</strong> @(currentTheme == "light" ? "☀️ Light Mode" : "🌙 Dark Mode")
+                    </p>
+                    <p style="color: #94a3b8; font-size: 0.75rem; margin: 0.5rem 0 0 0;">
+                        Theme preference is saved automatically and will persist across sessions.
+                    </p>
+                </div>
+            </div>
+
+            <div style="background: white; padding: 2rem; border-radius: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 2rem;">
+                <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 1.5rem; color: #1e293b;">📊 Journal Statistics</h2>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;">
+                    <div style="text-align: center; padding: 1.5rem; background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%); border-radius: 12px;">
+                        <div style="font-size: 2rem; font-weight: 700; color: #6366f1; margin-bottom: 0.25rem;">@totalEntries</div>
+                        <div style="color: #64748b; font-size: 0.875rem;">Total Entries</div>
+                    </div>
+
+                    <div style="text-align: center; padding: 1.5rem; background: linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, rgba(5, 150, 105, 0.05) 100%); border-radius: 12px;">
+                        <div style="font-size: 2rem; font-weight: 700; color: #10b981; margin-bottom: 0.25rem;">@currentStreak</div>
+                        <div style="color: #64748b; font-size: 0.875rem;">Current Streak</div>
+                    </div>
+
+                    <div style="text-align: center; padding: 1.5rem; background: linear-gradient(135deg, rgba(245, 158, 11, 0.05) 0%, rgba(217, 119, 6, 0.05) 100%); border-radius: 12px;">
+                        <div style="font-size: 2rem; font-weight: 700; color: #f59e0b; margin-bottom: 0.25rem;">@avgWordsDisplay</div>
+                        <div style="color: #64748b; font-size: 0.875rem;">Avg Words/Entry</div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="background: white; padding: 2rem; border-radius: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 2rem;">
+                <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 1.5rem; color: #1e293b;">🏷️ Most Used Tags</h2>
+
+                @if (topTags.Any())
+                {
+                    <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+                        @foreach (var tag in topTags)
+                        {
+                            <div style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; border-radius: 20px; background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); color: #075985; border: 2px solid #bae6fd;">
+                                <span style="font-weight: 600;">@tag.Tag</span>
+                                <span style="background: #0ea5e9; color: white; padding: 0.125rem 0.5rem; border-radius: 10px; font-size: 0.75rem; font-weight: 700;">@tag.Count</span>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <p style="color: #94a3b8; text-align: center; padding: 2rem;">No tags used yet</p>
+                }
+            </div>
+
+            <div style="background: #fef2f2; padding: 2rem; border-radius: 16px; border: 2px solid #fca5a5; margin-bottom: 2rem;">
+                <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem; color: #991b1b;">⚠️ Danger Zone</h2>
+                <p style="color: #7f1d1d; margin-bottom: 1.5rem;">Permanently delete all your journal entries. This action cannot be undone.</p>
+                <button @onclick="DeleteAllEntries" style="padding: 0.75rem 1.5rem; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; border: none; border-radius: 12px; font-weight: 600; cursor: pointer; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);">
+                    🗑️ Delete All Entries
+                </button>
+            </div>
+
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                <button @onclick="GoToDashboard" style="padding: 0.75rem 1.5rem; background: white; color: #6366f1; border: 2px solid #6366f1; border-radius: 12px; font-weight: 600; cursor: pointer;">
+                    📊 Back to Dashboard
+                </button>
+                <button @onclick="GoToHome" style="padding: 0.75rem 1.5rem; background: white; color: #64748b; border: 2px solid #e2e8f0; border-radius: 12px; font-weight: 600; cursor: pointer;">
+                    🏠 Home
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@code {
+    private int totalEntries = 0;
+    private int currentStreak = 0;
+    private double avgWords = 0;
+    private string avgWordsDisplay = "0";
+    private List<(string Tag, int Count)> topTags = new();
+    private string successMessage = "";
+
+    private string currentTheme = "light";
+
+    protected override void OnInitialized()
+    {
+        LoadStatistics();
+        LoadTheme();
+    }
+
+    private void LoadStatistics()
+    {
+        var allEntries = JournalService.GetAllEntries();
+        totalEntries = allEntries.Count;
+
+        var streaks = JournalService.CalculateStreaks();
+        currentStreak = streaks.Current;
+
+        avgWords = JournalService.GetAverageWordCount();
+        avgWordsDisplay = ((int)avgWords).ToString();
+        topTags = JournalService.GetMostUsedTags(10);
+    }
+
+    private void LoadTheme()
+    {
+        currentTheme = JournalService.GetTheme();
+    }
+
+    private void SetLightTheme()
+    {
+        SetTheme("light");
+    }
+
+    private void SetDarkTheme()
+    {
+        SetTheme("dark");
+    }
+
+    private void SetTheme(string theme)
+    {
+        currentTheme = theme;
+        JournalService.SaveTheme(theme);
+
+        // Apply theme immediately using JavaScript
+        JSRuntime.InvokeVoidAsync("applyTheme", theme);
+
+        successMessage = $"Theme changed to {(theme == "light" ? "☀️ Light" : "🌙 Dark")} mode";
+
+        Task.Delay(3000).ContinueWith(_ =>
+        {
+            successMessage = "";
+            InvokeAsync(StateHasChanged);
+        });
+    }
+
+    private void DeleteAllEntries()
+    {
+        var entries = JournalService.GetAllEntries();
+        foreach (var entry in entries)
+        {
+            JournalService.DeleteEntry(entry.Id);
+        }
+        LoadStatistics();
+        successMessage = "All entries have been deleted.";
+    }
+
+    private void GoToDashboard()
+    {
+        Navigation.NavigateTo("/dashboard");
+    }
+
+    private void GoToHome()
+    {
+        Navigation.NavigateTo("/");
+    }
+}
+}
