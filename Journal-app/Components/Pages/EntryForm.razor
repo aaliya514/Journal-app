@@ -1,128 +1,108 @@
-﻿@page "/entry-form"
+@page "/entry-form"
 @page "/entry-form/{EntryId:int}"
 @inject JournalService JournalService
 @inject NavigationManager Navigation
 
 <div style="min-height: 100vh; padding: 2rem;">
     <div style="max-width: 900px; margin: 0 auto;">
+        <div style="background: white; border-radius: 24px; padding: 2.5rem; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
 
-        <div style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); border-radius: 24px; padding: 2.5rem; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);">
+            <h1 style="font-size: 2rem; font-weight: 700; color: #6366f1; margin-bottom: 1rem;">Journal Entry</h1>
+
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">Entry Date</label>
+                <input type="date" @bind="currentEntry.EntryDate" style="width: 100%; padding: 0.875rem; border: 2px solid #e2e8f0; border-radius: 12px;" />
+            </div>
+
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">Title</label>
+                <input type="text" @bind="currentEntry.Title" placeholder="Entry title..." style="width: 100%; padding: 0.875rem; border: 2px solid #e2e8f0; border-radius: 12px;" />
+            </div>
+
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">Content</label>
+                <textarea @bind="currentEntry.Content" rows="10" placeholder="Write here..." style="width: 100%; padding: 0.875rem; border: 2px solid #e2e8f0; border-radius: 12px; resize: vertical;"></textarea>
+            </div>
+
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">Primary Mood (Required)</label>
+                <select @bind="currentEntry.PrimaryMood" style="width: 100%; padding: 0.875rem; border: 2px solid #e2e8f0; border-radius: 12px;">
+                    <option value="">Select mood...</option>
+                    <option value="Happy">Happy</option>
+                    <option value="Excited">Excited</option>
+                    <option value="Relaxed">Relaxed</option>
+                    <option value="Grateful">Grateful</option>
+                    <option value="Confident">Confident</option>
+                    <option value="Calm">Calm</option>
+                    <option value="Thoughtful">Thoughtful</option>
+                    <option value="Curious">Curious</option>
+                    <option value="Nostalgic">Nostalgic</option>
+                    <option value="Bored">Bored</option>
+                    <option value="Sad">Sad</option>
+                    <option value="Angry">Angry</option>
+                    <option value="Stressed">Stressed</option>
+                    <option value="Lonely">Lonely</option>
+                    <option value="Anxious">Anxious</option>
+                </select>
+            </div>
+
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">Secondary Mood 1 (Optional)</label>
+                <select @bind="currentEntry.SecondaryMood1" style="width: 100%; padding: 0.875rem; border: 2px solid #e2e8f0; border-radius: 12px;">
+                    <option value="">None</option>
+                    <option value="Happy">Happy</option>
+                    <option value="Excited">Excited</option>
+                    <option value="Relaxed">Relaxed</option>
+                    <option value="Grateful">Grateful</option>
+                    <option value="Confident">Confident</option>
+                    <option value="Calm">Calm</option>
+                    <option value="Thoughtful">Thoughtful</option>
+                    <option value="Curious">Curious</option>
+                    <option value="Nostalgic">Nostalgic</option>
+                    <option value="Bored">Bored</option>
+                    <option value="Sad">Sad</option>
+                    <option value="Angry">Angry</option>
+                    <option value="Stressed">Stressed</option>
+                    <option value="Lonely">Lonely</option>
+                    <option value="Anxious">Anxious</option>
+                </select>
+            </div>
+
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">Secondary Mood 2 (Optional)</label>
+                <select @bind="currentEntry.SecondaryMood2" style="width: 100%; padding: 0.875rem; border: 2px solid #e2e8f0; border-radius: 12px;">
+                    <option value="">None</option>
+                    <option value="Happy">Happy</option>
+                    <option value="Excited">Excited</option>
+                    <option value="Relaxed">Relaxed</option>
+                    <option value="Grateful">Grateful</option>
+                    <option value="Confident">Confident</option>
+                    <option value="Calm">Calm</option>
+                    <option value="Thoughtful">Thoughtful</option>
+                    <option value="Curious">Curious</option>
+                    <option value="Nostalgic">Nostalgic</option>
+                    <option value="Bored">Bored</option>
+                    <option value="Sad">Sad</option>
+                    <option value="Angry">Angry</option>
+                    <option value="Stressed">Stressed</option>
+                    <option value="Lonely">Lonely</option>
+                    <option value="Anxious">Anxious</option>
+                </select>
+            </div>
+
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">Category (Optional)</label>
+                <input type="text" @bind="currentEntry.Category" placeholder="Personal, Work, Travel..." style="width: 100%; padding: 0.875rem; border: 2px solid #e2e8f0; border-radius: 12px;" />
+            </div>
 
             <div style="margin-bottom: 2rem;">
-                <h1 style="font-size: 2.5rem; font-weight: 800; background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 0.5rem;">
-                    @(EntryId.HasValue ? "✏️ Edit Entry" : "✍️ New Entry")
-                </h1>
-                <p style="color: #64748b; font-size: 1rem;">@currentEntry.EntryDate.ToString("dddd, MMMM dd, yyyy")</p>
+                <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">Tags (Optional)</label>
+                <input type="text" @bind="tagInput" placeholder="Tags separated by commas..." style="width: 100%; padding: 0.875rem; border: 2px solid #e2e8f0; border-radius: 12px;" />
             </div>
 
-            @if (!string.IsNullOrEmpty(errorMessage))
-            {
-                <div style="padding: 1rem; background: #fee2e2; border: 2px solid #ef4444; border-radius: 12px; color: #991b1b; margin-bottom: 1.5rem;">
-                    ⚠️ @errorMessage
-                </div>
-            }
-
-            <div style="margin-bottom: 1.5rem;">
-                <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: #1e293b;">📅 Entry Date</label>
-                <input type="date" @bind="currentEntry.EntryDate" style="width: 100%; padding: 0.875rem 1rem; border: 2px solid #e2e8f0; border-radius: 12px; font-size: 0.95rem;" />
-            </div>
-
-            <div style="margin-bottom: 1.5rem;">
-                <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: #1e293b;">📝 Title</label>
-                <input type="text" @bind="currentEntry.Title" placeholder="Give your entry a title..." style="width: 100%; padding: 0.875rem 1rem; border: 2px solid #e2e8f0; border-radius: 12px; font-size: 0.95rem;" />
-            </div>
-
-            <div style="margin-bottom: 1.5rem;">
-                <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: #1e293b;">✍️ Content</label>
-                <textarea @bind="currentEntry.Content" rows="12" placeholder="Write your thoughts here..." style="width: 100%; padding: 0.875rem 1rem; border: 2px solid #e2e8f0; border-radius: 12px; font-size: 0.95rem; resize: vertical; font-family: inherit; line-height: 1.6;"></textarea>
-                <p style="color: #64748b; font-size: 0.875rem; margin-top: 0.5rem;">@CountWords(currentEntry.Content) words</p>
-            </div>
-
-            <div style="margin-bottom: 1.5rem;">
-                <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: #1e293b;">😊 Primary Mood (Required)</label>
-                <select @bind="currentEntry.PrimaryMood" style="width: 100%; padding: 0.875rem 1rem; border: 2px solid #e2e8f0; border-radius: 12px; font-size: 0.95rem;">
-                    <option value="">Select your primary mood...</option>
-                    @foreach (var category in MoodConstants.MoodCategories)
-                    {
-                        <optgroup label="@category.Key">
-                            @foreach (var mood in category.Value)
-                            {
-                                <option value="@mood">@MoodConstants.GetMoodEmoji(mood) @mood</option>
-                            }
-                        </optgroup>
-                    }
-                </select>
-            </div>
-
-            <div style="margin-bottom: 1.5rem;">
-                <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: #1e293b;">😌 Secondary Mood 1 (Optional)</label>
-                <select @bind="currentEntry.SecondaryMood1" style="width: 100%; padding: 0.875rem 1rem; border: 2px solid #e2e8f0; border-radius: 12px; font-size: 0.95rem;">
-                    <option value="">None</option>
-                    @foreach (var category in MoodConstants.MoodCategories)
-                    {
-                        <optgroup label="@category.Key">
-                            @foreach (var mood in category.Value)
-                            {
-                                <option value="@mood">@MoodConstants.GetMoodEmoji(mood) @mood</option>
-                            }
-                        </optgroup>
-                    }
-                </select>
-            </div>
-
-            <div style="margin-bottom: 1.5rem;">
-                <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: #1e293b;">😔 Secondary Mood 2 (Optional)</label>
-                <select @bind="currentEntry.SecondaryMood2" style="width: 100%; padding: 0.875rem 1rem; border: 2px solid #e2e8f0; border-radius: 12px; font-size: 0.95rem;">
-                    <option value="">None</option>
-                    @foreach (var category in MoodConstants.MoodCategories)
-                    {
-                        <optgroup label="@category.Key">
-                            @foreach (var mood in category.Value)
-                            {
-                                <option value="@mood">@MoodConstants.GetMoodEmoji(mood) @mood</option>
-                            }
-                        </optgroup>
-                    }
-                </select>
-            </div>
-
-            <div style="margin-bottom: 1.5rem;">
-                <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: #1e293b;">📂 Category (Optional)</label>
-                <input type="text" @bind="currentEntry.Category" placeholder="e.g., Personal, Work, Travel..." style="width: 100%; padding: 0.875rem 1rem; border: 2px solid #e2e8f0; border-radius: 12px; font-size: 0.95rem;" />
-            </div>
-
-            <div style="margin-bottom: 2rem;">
-                <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: #1e293b;">🏷️ Tags (Optional)</label>
-                <input type="text" @bind="tagInput" placeholder="Add tags separated by commas..." style="width: 100%; padding: 0.875rem 1rem; border: 2px solid #e2e8f0; border-radius: 12px; font-size: 0.95rem; margin-bottom: 0.5rem;" />
-                <p style="color: #64748b; font-size: 0.875rem; margin-bottom: 1rem;">Suggestions: Work, Health, Family, Travel, Fitness, Reading, Meditation</p>
-
-                @if (currentEntry.Tags.Any())
-                {
-                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                        @foreach (var tag in currentEntry.Tags)
-                        {
-                            <span style="display: inline-flex; align-items: center; padding: 0.375rem 0.875rem; border-radius: 16px; background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); color: #075985; border: 1px solid #bae6fd; font-size: 0.8125rem; font-weight: 500;">
-                                @tag
-                                <button @onclick="() => RemoveTag(tag)" style="margin-left: 0.5rem; background: none; border: none; color: #075985; cursor: pointer; font-weight: bold;">×</button>
-                            </span>
-                        }
-                    </div>
-                }
-            </div>
-
-            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
-                <button @onclick="SaveEntry" style="padding: 0.875rem 2rem; background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); color: white; border: none; border-radius: 12px; font-weight: 600; cursor: pointer; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);">
-                    💾 Save Entry
-                </button>
-                <button @onclick="Cancel" style="padding: 0.875rem 2rem; background: white; color: #64748b; border: 2px solid #e2e8f0; border-radius: 12px; font-weight: 600; cursor: pointer;">
-                    Cancel
-                </button>
-                @if (EntryId.HasValue)
-                {
-                    <button @onclick="DeleteEntry" style="padding: 0.875rem 2rem; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; border: none; border-radius: 12px; font-weight: 600; cursor: pointer; margin-left: auto;">
-                        🗑️ Delete
-                    </button>
-                }
+            <div style="display: flex; gap: 1rem;">
+                <button @onclick="SaveEntry" style="padding: 0.875rem 2rem; background: #6366f1; color: white; border: none; border-radius: 12px; font-weight: 600; cursor: pointer;">Save</button>
+                <button @onclick="Cancel" style="padding: 0.875rem 2rem; background: white; color: #64748b; border: 2px solid #e2e8f0; border-radius: 12px; font-weight: 600; cursor: pointer;">Cancel</button>
             </div>
 
         </div>
@@ -133,12 +113,17 @@
     [Parameter]
     public int? EntryId { get; set; }
 
-    private JournalEntry currentEntry = new();
+    private JournalEntry currentEntry = new JournalEntry();
     private string tagInput = "";
-    private string errorMessage = "";
 
     protected override void OnInitialized()
     {
+        if (!JournalService.IsAuthenticated())
+        {
+            Navigation.NavigateTo("/login", forceLoad: true);
+            return;
+        }
+
         if (EntryId.HasValue)
         {
             var entry = JournalService.GetEntryById(EntryId.Value);
@@ -156,22 +141,23 @@
 
     private void SaveEntry()
     {
-        errorMessage = "";
-
         if (string.IsNullOrWhiteSpace(currentEntry.PrimaryMood))
         {
-            errorMessage = "Please select a primary mood before saving.";
             return;
         }
 
-        // Parse tags
         if (!string.IsNullOrWhiteSpace(tagInput))
         {
-            currentEntry.Tags = tagInput.Split(',')
-                .Select(t => t.Trim())
-                .Where(t => !string.IsNullOrWhiteSpace(t))
-                .Distinct()
-                .ToList();
+            currentEntry.Tags = new List<string>();
+            string[] tags = tagInput.Split(',');
+            for (int i = 0; i < tags.Length; i++)
+            {
+                string t = tags[i].Trim();
+                if (!string.IsNullOrWhiteSpace(t))
+                {
+                    currentEntry.Tags.Add(t);
+                }
+            }
         }
 
         if (EntryId.HasValue)
@@ -180,42 +166,15 @@
         }
         else
         {
-            var existingEntry = JournalService.GetEntryByDate(currentEntry.EntryDate);
-            if (existingEntry != null)
-            {
-                errorMessage = "An entry already exists for this date. Please choose a different date.";
-                return;
-            }
             JournalService.AddEntry(currentEntry);
         }
 
         Navigation.NavigateTo("/dashboard");
     }
 
-    private void DeleteEntry()
-    {
-        if (EntryId.HasValue)
-        {
-            JournalService.DeleteEntry(EntryId.Value);
-            Navigation.NavigateTo("/dashboard");
-        }
-    }
-
     private void Cancel()
     {
         Navigation.NavigateTo("/dashboard");
     }
-
-    private void RemoveTag(string tag)
-    {
-        currentEntry.Tags.Remove(tag);
-        tagInput = string.Join(", ", currentEntry.Tags);
-    }
-
-    private int CountWords(string text)
-    {
-        if (string.IsNullOrWhiteSpace(text))
-            return 0;
-        return text.Split(new[] { ' ', '\n', '\r', '\t' }, StringSplitOptions.RemoveEmptyEntries).Length;
-    }
 }
+
