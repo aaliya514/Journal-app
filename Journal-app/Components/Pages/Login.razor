@@ -1,0 +1,114 @@
+﻿@page "/login"
+@inject JournalService JournalService
+@inject NavigationManager Navigation
+
+<div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+    <div style="background: white; padding: 3rem; border-radius: 24px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); width: 100%; max-width: 400px; text-align: center;">
+
+        <div style="font-size: 4rem; margin-bottom: 1rem;">📔</div>
+
+        <h1 style="font-size: 2rem; font-weight: 800; color: #1e293b; margin-bottom: 0.5rem;">
+            Journal App
+        </h1>
+        <p style="color: #64748b; margin-bottom: 2rem;">Enter your PIN to access your journal</p>
+
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div style="padding: 1rem; background: #fef2f2; border: 2px solid #fca5a5; border-radius: 12px; color: #991b1b; margin-bottom: 1.5rem;">
+                @errorMessage
+            </div>
+        }
+
+        @if (!isSetup)
+        {
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; text-align: left; color: #64748b; font-size: 0.875rem; margin-bottom: 0.5rem; font-weight: 600;">Enter PIN</label>
+                <input type="password" @bind="enteredPin" maxlength="6" placeholder="Enter 4-6 digit PIN"
+                       style="width: 100%; padding: 1rem; border: 2px solid #e2e8f0; border-radius: 12px; font-size: 1.5rem; text-align: center; letter-spacing: 0.5rem;" />
+            </div>
+
+            <button @onclick="VerifyPin" style="width: 100%; padding: 1rem; background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); color: white; border: none; border-radius: 12px; font-weight: 700; font-size: 1rem; cursor: pointer; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);">
+                Unlock Journal
+            </button>
+        }
+        else
+        {
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; text-align: left; color: #64748b; font-size: 0.875rem; margin-bottom: 0.5rem; font-weight: 600;">Create New PIN</label>
+                <input type="password" @bind="newPin" maxlength="6" placeholder="Enter 4-6 digit PIN"
+                       style="width: 100%; padding: 1rem; border: 2px solid #e2e8f0; border-radius: 12px; font-size: 1.5rem; text-align: center; letter-spacing: 0.5rem; margin-bottom: 1rem;" />
+
+                <label style="display: block; text-align: left; color: #64748b; font-size: 0.875rem; margin-bottom: 0.5rem; font-weight: 600;">Confirm PIN</label>
+                <input type="password" @bind="confirmPin" maxlength="6" placeholder="Confirm PIN"
+                       style="width: 100%; padding: 1rem; border: 2px solid #e2e8f0; border-radius: 12px; font-size: 1.5rem; text-align: center; letter-spacing: 0.5rem;" />
+            </div>
+
+            <button @onclick="SetupPin" style="width: 100%; padding: 1rem; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; border-radius: 12px; font-weight: 700; font-size: 1rem; cursor: pointer; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);">
+                Create PIN & Start
+            </button>
+        }
+
+        <p style="color: #94a3b8; font-size: 0.75rem; margin-top: 2rem;">
+            Your journal is protected and stored locally on this device.
+        </p>
+    </div>
+</div>
+
+@code {
+    private string enteredPin = "";
+    private string newPin = "";
+    private string confirmPin = "";
+    private string errorMessage = "";
+    private bool isSetup = false;
+
+    protected override void OnInitialized()
+    {
+        isSetup = !JournalService.HasPinSet();
+
+        if (JournalService.IsAuthenticated())
+        {
+            Navigation.NavigateTo("/");
+        }
+    }
+
+    private void VerifyPin()
+    {
+        errorMessage = "";
+
+        if (string.IsNullOrWhiteSpace(enteredPin))
+        {
+            errorMessage = "Please enter your PIN";
+            return;
+        }
+
+        if (JournalService.VerifyPin(enteredPin))
+        {
+            Navigation.NavigateTo("/");
+        }
+        else
+        {
+            errorMessage = "Incorrect PIN. Please try again.";
+            enteredPin = "";
+        }
+    }
+
+    private void SetupPin()
+    {
+        errorMessage = "";
+
+        if (string.IsNullOrWhiteSpace(newPin) || newPin.Length < 4)
+        {
+            errorMessage = "PIN must be at least 4 digits";
+            return;
+        }
+
+        if (newPin != confirmPin)
+        {
+            errorMessage = "PINs do not match";
+            return;
+        }
+
+        JournalService.SetPin(newPin);
+        Navigation.NavigateTo("/");
+    }
+}
