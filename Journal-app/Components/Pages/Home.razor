@@ -1,5 +1,17 @@
-﻿@page "/"
+@page "/"
+@inject JournalService JournalService
 @inject NavigationManager Navigation
+
+@code {
+    protected override void OnInitialized()
+    {
+        if (!JournalService.IsAuthenticated())
+        {
+            Navigation.NavigateTo("/login");
+        }
+    }
+}
+
 
 <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem;">
     <div style="max-width: 1200px; width: 100%; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); border-radius: 24px; padding: 3rem; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);">
