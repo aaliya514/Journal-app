@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
@@ -11,11 +11,13 @@ namespace Journal_app.Services
         private List<JournalEntry> _entries = new();
         private int _nextId = 1;
         private readonly string _filePath;
+        private readonly string _settingsPath;
 
         public JournalService()
         {
             _filePath = Path.Combine(FileSystem.AppDataDirectory, "journal_data.json");
             LoadData();
+            _settingsPath = Path.Combine(FileSystem.AppDataDirectory, "user_settings.json");
         }
 
         private void LoadData()
@@ -250,9 +252,7 @@ namespace Journal_app.Services
             }
         }
 
-        /// <summary>
-        /// Save the theme preference to user settings file
-        /// </summary>
+        
         public void SaveTheme(string theme)
         {
             try
@@ -283,6 +283,117 @@ namespace Journal_app.Services
             {
                 Console.WriteLine($"Error saving theme: {ex.Message}");
             }
+        }
+
+        // ========== PIN/PASSWORD AUTHENTICATION ==========
+      
+        public bool HasPinSet()
+        {
+            try
+            {
+                if (File.Exists(_settingsPath))
+                {
+                    var json = File.ReadAllText(_settingsPath);
+                    var settings = JsonSerializer.Deserialize<Dictionary<string, string>>(json);
+                    return settings != null && settings.ContainsKey("pin") && !string.IsNullOrEmpty(settings["pin"]);
+                }
+                return false;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public void SetPin(string pin)
+        {
+            try
+            {
+                Dictionary<string, string> settings;
+
+                if (File.Exists(_settingsPath))
+                {
+                    var json = File.ReadAllText(_settingsPath);
+                    settings = JsonSerializer.Deserialize<Dictionary<string, string>>(json) ?? new();
+                }
+                else
+                {
+                    settings = new Dictionary<string, string>();
+                }
+
+                settings["pin"] = pin;
+                // Store authentication state
+                settings["isAuthenticated"] = "true";
+                settings["lastAuthTime"] = DateTime.Now.ToString("o");
+
+                var updatedJson = JsonSerializer.Serialize(settings);
+                File.WriteAllText(_settingsPath, updatedJson);
+            }
+            catch { }
+        }
+
+        public bool VerifyPin(string pin)
+        {
+            try
+            {
+                if (File.Exists(_settingsPath))
+                {
+                    var json = File.ReadAllText(_settingsPath);
+                    var settings = JsonSerializer.Deserialize<Dictionary<string, string>>(json);
+                    if (settings != null && settings.ContainsKey("pin") && settings["pin"] == pin)
+                    {
+                        // Save authentication state
+                        settings["isAuthenticated"] = "true";
+                        settings["lastAuthTime"] = DateTime.Now.ToString("o");
+                        var updatedJson = JsonSerializer.Serialize(settings);
+                        File.WriteAllText(_settingsPath, updatedJson);
+                        return true;
+                    }
+                }
+                return false;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public bool IsAuthenticated()
+        {
+            try
+            {
+                if (File.Exists(_settingsPath))
+                {
+                    var json = File.ReadAllText(_settingsPath);
+                    var settings = JsonSerializer.Deserialize<Dictionary<string, string>>(json);
+
+                    if (settings != null && settings.ContainsKey("isAuthenticated"))
+                    {
+                        return settings["isAuthenticated"] == "true";
+                    }
+                }
+                return false;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public void Logout()
+        {
+            try
+            {
+                if (File.Exists(_settingsPath))
+                {
+                    var json = File.ReadAllText(_settingsPath);
+                    var settings = JsonSerializer.Deserialize<Dictionary<string, string>>(json) ?? new();
+                    settings["isAuthenticated"] = "false";
+                    var updatedJson = JsonSerializer.Serialize(settings);
+                    File.WriteAllText(_settingsPath, updatedJson);
+                }
+            }
+            catch { }
         }
     }
 }
