@@ -1,10 +1,9 @@
-﻿@page "/calendar-view"
+@page "/calendar-view"
 @inject JournalService JournalService
 @inject NavigationManager Navigation
 
 <div style="min-height: 100vh; padding: 2rem;">
     <div style="max-width: 1400px; margin: 0 auto;">
-
         <div style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); border-radius: 24px; padding: 2rem; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); margin-bottom: 2rem;">
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem;">
                 <div>
@@ -129,7 +128,6 @@
                 </div>
             </div>
         }
-
     </div>
 </div>
 
@@ -141,6 +139,12 @@
 
     protected override void OnInitialized()
     {
+        if (!JournalService.IsAuthenticated())
+        {
+            Navigation.NavigateTo("/login", forceLoad: true);
+            return;
+        }
+
         LoadCalendar();
         LoadEntries();
     }
@@ -204,23 +208,38 @@
 
     private string GetDayStyle(JournalEntry? entry, bool isToday, bool isCurrentMonth)
     {
-        var baseStyle = "aspect-ratio: 1; border: 2px solid; border-radius: 12px; padding: 0.75rem; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s; ";
+        var baseStyle = "aspect-ratio: 1; border: 2px solid; border-radius: 12px; padding: 0.75rem; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s;";
 
         if (entry != null)
         {
             var category = MoodConstants.GetMoodCategory(entry.PrimaryMood);
-            return category switch
+            if (category == "Positive")
             {
-                "Positive" => baseStyle + "background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border-color: #059669;",
-                "Neutral" => baseStyle + "background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; border-color: #2563eb;",
-                "Negative" => baseStyle + "background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; border-color: #dc2626;",
-                _ => baseStyle + "background: white; border-color: #e2e8f0;"
-            };
+                return baseStyle + " background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border-color: #059669;";
+            }
+            else if (category == "Neutral")
+            {
+                return baseStyle + " background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; border-color: #2563eb;";
+            }
+            else if (category == "Negative")
+            {
+                return baseStyle + " background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; border-color: #dc2626;";
+            }
+            else
+            {
+                return baseStyle + " background: white; border-color: #e2e8f0;";
+            }
         }
         else
         {
-            var borderColor = isToday ? "border-color: #6366f1; border-width: 3px; box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);" : "border-color: #e2e8f0;";
-            return baseStyle + "background: white; " + borderColor;
+            if (isToday)
+            {
+                return baseStyle + " background: white; border-color: #6366f1; border-width: 3px; box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);";
+            }
+            else
+            {
+                return baseStyle + " background: white; border-color: #e2e8f0;";
+            }
         }
     }
 }
